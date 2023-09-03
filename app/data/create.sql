@@ -1,4 +1,3 @@
-
 CREATE TABLE IF NOT EXISTS user (
     chat_id INTEGER PRIMARY KEY,
     lon TEXT default NULL,
@@ -6,7 +5,7 @@ CREATE TABLE IF NOT EXISTS user (
     city TEXT default NULL
 );
 CREATE TABLE IF NOT EXISTS yandex_history (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    stat_id INTEGER PRIMARY KEY AUTOINCREMENT,
     city TEXT,
     lon REAL,
     lat REAL,

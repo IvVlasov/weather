@@ -55,4 +55,4 @@ lon = 39.83023
 lat = 57.583337
 
 from datetime import datetime, timedelta
-get_weather(lon, lat, datetime.today() + timedelta(days=1))
+# get_weather(lon, lat, datetime.today() + timedelta(days=1))

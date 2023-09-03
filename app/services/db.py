@@ -2,8 +2,17 @@ import sqlite3
 from settings import DB_PATH
 
 
+def dict_factory(cursor, row):
+    d = {}
+    for idx, col in enumerate(cursor.description):
+        d[col[0]] = row[idx]
+    return d
+
+
 def create_con():
-    return sqlite3.connect(DB_PATH)
+    con = sqlite3.connect(DB_PATH)
+    con.row_factory = dict_factory
+    return con
 
 
 def create_sql():
@@ -51,13 +60,50 @@ def get_user_coords(chat_id):
 ''' Yandex '''
 
 
-def create_yandex_history(chat_id):
+def get_or_create_yandex_history(city, lon, lat, dt):
     con = create_con()
     cursor = con.cursor()
-    query = 'INSERT OR IGNORE INTO yandex_history (city, lon, lat, weather, dt) VALUES (?, ?, ?, ?, ?)'
-    cursor.execute(query, (chat_id, ))
+    lon, lat = round(lon, 1), round(lat, 1)
+    query = 'SELECT stat_id FROM yandex_history WHERE city=? AND lon=? AND lat=? AND dt = ?'
+    cursor.execute(query, (city, lon, lat, dt))
+    row_id = cursor.fetchone()
+    if not row_id:
+        query = 'INSERT INTO yandex_history (city, lon, lat, dt) VALUES (?, ?, ?, ?) RETURNING stat_id'
+        cursor.execute(query, (city, lon, lat, dt))
+        row_id = cursor.fetchone()
+    con.commit()
+    con.close()
+    return row_id
+
+
+def create_yandex_history_detail(stat_id, part, temp_avg, wind_speed, wind_dir, pressure_mm, humidity, prec_type):
+    con = create_con()
+    cursor = con.cursor()
+    
+    query = 'INSERT INTO yandex_history_detail \
+        (stat_id, part, temp_avg, wind_speed, wind_dir, pressure_mm, humidity, prec_type) \
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+    cursor.execute(query, (stat_id, part, temp_avg, wind_speed, wind_dir, pressure_mm, humidity, prec_type))
     con.commit()
     con.close()
 
 
+def get_yandex_history_weather(lon, lat, dt):
+    con = create_con()
+    cursor = con.cursor()
+    query = 'select * from yandex_history join yandex_history_detail using(stat_id) WHERE lon=? AND lat=? AND dt=?'
+    
+    lon, lat = round(lon, 1), round(lat, 1)
+    dt = dt.strftime('%Y-%m-%d')
+    
+    cursor.execute(query, (lon, lat, dt))
+    res = cursor.fetchone()
+    print(res)
+
+
 create_sql()
+from datetime import datetime
+
+get_or_create_yandex_history('hello', 12.31, 123.522,  datetime.today())
+# create_yandex_history_detail(1, 'day', 10, 31, 31, 31, 'nw', 13)
+# get_yandex_history_weather(12.31, 123.522, datetime.today())
