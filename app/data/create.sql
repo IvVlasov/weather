@@ -1,25 +1,26 @@
 CREATE TABLE IF NOT EXISTS user (
     chat_id INTEGER PRIMARY KEY,
-    lon TEXT default NULL,
-    lat TEXT default NULL,
+    lon REAL default NULL,
+    lat REAL default NULL,
     city TEXT default NULL
 );
-CREATE TABLE IF NOT EXISTS yandex_history (
+CREATE TABLE IF NOT EXISTS weather_history (
     stat_id INTEGER PRIMARY KEY AUTOINCREMENT,
     city TEXT,
     lon REAL,
     lat REAL,
     dt TEXT
 );
-CREATE TABLE IF NOT EXISTS yandex_history_detail (
+CREATE TABLE IF NOT EXISTS weather_history_detail (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     stat_id INTEGER,
+    source TEXT, -- yandex/gismeteo
     part TEXT, -- day/morning/night/evening
     temp_avg INTEGER,
     wind_speed INTEGER,
-    wind_dir TEXT, -- nw/n/ne/e/se/s/sw/w/c
+    wind_dir TEXT,
     pressure_mm INTEGER,
     humidity INTEGER,
-    prec_type INTEGER, -- 0/1/2/3
+    prec_type TEXT,
     FOREIGN KEY (stat_id)  REFERENCES yandex_history (id)
 );
