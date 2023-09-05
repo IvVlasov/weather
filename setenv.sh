@@ -1,3 +1,3 @@
-export BOT_API_TOKEN="5087442932:AAGJ8pBRl-XmdZsQAgOjxatA5Qyh6t974ns"
-export GEO_API_TOKEN="c858c41d-c3a5-4f83-a67d-5a5bbab7f7af"
-export WEATHER_API_TOKEN="a829f327-00e7-4728-a251-f4c8d2f124ff"
+export BOT_API_TOKEN=""
+export GEO_API_TOKEN=""
+export WEATHER_API_TOKEN=""
