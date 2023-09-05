@@ -34,6 +34,20 @@ def create_user(chat_id):
     cursor = con.cursor()
     query = 'INSERT OR IGNORE INTO user (chat_id) VALUES (?)'
     cursor.execute(query, (chat_id, ))
+    query = 'INSERT OR IGNORE INTO user_choices (chat_id) VALUES (?)'
+    cursor.execute(query, (chat_id, ))
+    con.commit()
+    con.close()
+
+
+def update_user_choices(chat_id, source):
+    con = create_con()
+    cursor = con.cursor()
+    if source == 'yandex':
+        query = 'UPDATE user_choices SET yandex=yandex+1 WHERE chat_id=?'
+    if source == 'gismeteo':
+        query = 'UPDATE user_choices SET gismeteo=gismeteo+1 WHERE chat_id=?'
+    cursor.execute(query, (chat_id, ))
     con.commit()
     con.close()
 
@@ -47,14 +61,23 @@ def set_user_coords(chat_id, lon, lat, city):
     con.close()
 
 
-def get_user_coords(chat_id):
+def set_user_notice(chat_id, time):
     con = create_con()
     cursor = con.cursor()
-    query = 'SELECT lon, lat, city FROM user WHERE chat_id=?'
+    query = 'UPDATE user SET notice_time=? WHERE chat_id=?'
+    cursor.execute(query, (time, chat_id))
+    con.commit()
+    con.close()
+
+
+def get_user(chat_id):
+    con = create_con()
+    cursor = con.cursor()
+    query = 'SELECT * FROM user WHERE chat_id=?'
     cursor.execute(query, (chat_id, ))
     row = cursor.fetchone()
     con.close()
-    return row['lon'], row['lat'], row['city']
+    return row
 
 
 def get_user_city(chat_id):
@@ -65,6 +88,26 @@ def get_user_city(chat_id):
     row = cursor.fetchone()
     con.close()
     return row['lon'], row['lat']
+
+
+def get_user_notice(chat_id):
+    con = create_con()
+    cursor = con.cursor()
+    query = 'SELECT notice_time FROM user WHERE chat_id=?'
+    cursor.execute(query, (chat_id, ))
+    row = cursor.fetchone()
+    con.close()
+    return row['notice_time']
+
+
+def get_users_notices(hour_time):
+    con = create_con()
+    cursor = con.cursor()
+    query = 'SELECT u.*, uc.yandex, uc.gismeteo FROM user u join user_choices uc using(chat_id) WHERE notice_time = ?'
+    cursor.execute(query, (hour_time, ))
+    row = cursor.fetchall()
+    con.close()
+    return row
 
 
 ''' Yandex '''
